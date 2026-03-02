@@ -18,6 +18,8 @@ public class SimpleClientHandler extends ChannelInboundHandlerAdapter implements
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		final Object m = msg;
+
+		//处理心跳保活
 		if(msg.toString().equals("ping")){
 			System.out.println("收到读写空闲ping,向服务端发送pong");
 			ctx.channel().writeAndFlush("pong\r\n");
@@ -29,6 +31,8 @@ public class SimpleClientHandler extends ChannelInboundHandlerAdapter implements
 		exec.execute(new Runnable() {
 			
 			public void run() {
+
+				//拆快递：把服务端发回来的 JSON 字符串，反序列化成 Java 的 Response 对象
 				Response response = JSONObject.parseObject(m.toString(), Response.class);
 				System.out.println("SimpleClientHandler中的Response:"+JSONObject.toJSONString(response));
 				ResultFuture.receive(response);				

@@ -28,8 +28,10 @@ public class ServerHandler extends ChannelInboundHandlerAdapter  {
 			
 			@Override
 			public void run() {
+				// 1. 拆快递：把客户端发来的 JSON 字符串，重新变回 Java 的 ServerRequest 对象
 				ServerRequest serverRequest = JSONObject.parseObject(msg.toString(), ServerRequest.class);
 				System.out.println(serverRequest.getCommand());
+
 				Medium medium = Medium.newInstance();//生成中介者模式
 				
 				Response response = medium.process(serverRequest);
