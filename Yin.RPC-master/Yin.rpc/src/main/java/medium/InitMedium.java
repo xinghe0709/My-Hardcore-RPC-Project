@@ -23,6 +23,7 @@ public class InitMedium implements BeanPostProcessor{
 
 
 	@Override
+	//在bean的实例化后进行aop
 	public Object postProcessAfterInitialization(Object bean, String arg1) throws BeansException {
 		// 1. 搜寻猎物：谁的头上戴了 @Remote 注解？（比如你的 TestRemoteImpl）
 		if(bean.getClass().isAnnotationPresent(Remote.class)){

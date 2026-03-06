@@ -16,7 +16,8 @@ public class Medium {
 	
 	
 	private Medium(){}
-	
+
+	//单例模式
 	public static Medium newInstance(){
 		if(media == null){
 			media = new Medium();
@@ -42,6 +43,8 @@ public class Medium {
 
 			// 3. 极其关键：参数类型转换！
 			Class type = method.getParameterTypes()[0];//先只实现1个参数的方法,获取这个方法需要的参数类型
+
+			//content里面装载的是你进行远程调用时传递的“具体参数”
 			Object content = request.getContent();
 			// 因为网络传过来的 JSON 被默认解析成了普通的 Map，这里需要用 FastJson 把它强转回 User 对象
 			Object args = JSONObject.parseObject(JSONObject.toJSONString(content), type);

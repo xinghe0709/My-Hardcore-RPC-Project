@@ -31,7 +31,6 @@ public class NettyClient {
 //	public static Set<String> realServerPath = new HashSet<String>();//去重and去序列号
 	public static final Bootstrap b = new Bootstrap();
 
-
 	private static ChannelFuture f = null;
 	
 	static{
@@ -56,10 +55,11 @@ public class NettyClient {
 
 				// 1. 连上ZK
 				CuratorFramework client = ZooKeeperFactory.getClient();
-			
-				List<String> serverPath = client.getChildren().forPath(Constans.SERVER_PATH);
-				//客户端加上ZK监听服务器的变化
 
+				//获取指定路径下的所有节点
+				List<String> serverPath = client.getChildren().forPath(Constans.SERVER_PATH);
+
+				//客户端加上ZK监听服务器的变化
 			CuratorWatcher watcher = new ServerWatcher();
 			client.getChildren().usingWatcher(watcher ).forPath(Constans.SERVER_PATH);
 
@@ -68,8 +68,14 @@ public class NettyClient {
 			// 这样如果一台挂了，它还能调另一台。
 				for(String path :serverPath){
 					String[] str = path.split("#");
+
+					// 把活着的服务器都记在小本本上
 					ChannelManager.realServerPath.add(str[0]+"#"+str[1]);
+
+					// ⭐️ 核心变化：对每一台服务器都发起异步连接！
 					ChannelFuture channnelFuture = NettyClient.b.connect(str[0], Integer.valueOf(str[1]));
+
+					// 把连接全部扔进连接池里
 					ChannelManager.addChnannel(channnelFuture);
 				}
 

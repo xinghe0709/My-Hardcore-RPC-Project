@@ -51,7 +51,7 @@ public class NettyInitial implements ApplicationListener<ContextRefreshedEvent> 
 						// 设置\r\n为分隔符，防粘包工序。底层的 TCP 是像水流一样的字节流，它可不管你发的是一个 JSON 还是半个 JSON，它可能把两个请求粘在一起发过来。
 						ch.pipeline().addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, Delimiters.lineDelimiter()[0]));
 						ch.pipeline().addLast(new StringDecoder());//字符串解码器
-						ch.pipeline().addLast(new IdleStateHandler(20, 15, 10, TimeUnit.SECONDS));
+						//ch.pipeline().addLast(new IdleStateHandler(20, 15, 10, TimeUnit.SECONDS));
 
 						//虽然此时还在 work 线程，但作者做了一个极其重要的决定——提交给 Executor exec（业务线程池）。
 						//work 线程把这个 String 消息往线程池里一丢，它的 IO 任务就完成了，立刻回去处理下一个网络包。
@@ -80,7 +80,6 @@ public class NettyInitial implements ApplicationListener<ContextRefreshedEvent> 
 				// 核心代码：在 ZK 上创建临时节点，告诉全世界“我上线了”
 				client.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(Constans.SERVER_PATH+"/"+address.getHostAddress()+"#"+port+"#");
 				System.out.println("成功");
-
 			}
 
 			//closeFuture() 会返回一个监听服务器关闭状态的 Future 对象。

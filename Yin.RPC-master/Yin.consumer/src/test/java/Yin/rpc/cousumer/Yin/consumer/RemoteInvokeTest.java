@@ -23,6 +23,7 @@ import Yin.rpc.user.UserRemote;
 @ComponentScan("\\")
 public class RemoteInvokeTest {
 	public static List<User> list = new ArrayList<User>();
+
 	@RemoteInvoke
 	public static TestRemote userremote;
 	public static User user;

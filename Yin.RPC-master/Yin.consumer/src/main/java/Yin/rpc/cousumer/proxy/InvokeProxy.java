@@ -33,7 +33,7 @@ public class InvokeProxy implements BeanPostProcessor {
 		
 	}
 
-
+	// 在bean实例化后进行aop，生成动态代理
 	public Object postProcessBeforeInitialization(Object bean, String arg1) throws BeansException {
 //		System.out.println(bean.getClass().getName());
 
@@ -42,6 +42,7 @@ public class InvokeProxy implements BeanPostProcessor {
 		// （在你的 RemoteInvokeTest 测试类里，TestRemote userremote 就戴着这个注解）。
 		Field[] fields = bean.getClass().getDeclaredFields();
 		for(Field field : fields){
+
 			if(field.isAnnotationPresent(RemoteInvoke.class)){
 				field.setAccessible(true);
 				//找到后，调用 field.setAccessible(true) 强行打破 Java 的 private 封装限制，准备给这个字段塞一个假对象进去
@@ -50,6 +51,7 @@ public class InvokeProxy implements BeanPostProcessor {
 //				putMethodClass(methodmap,field);
 //				Enhancer enhancer = new Enhancer();
 
+				//cglib动态代理逻辑
 				enhancer.setInterfaces(new Class[]{field.getType()});
 				enhancer.setCallback(new MethodInterceptor() {
 					
