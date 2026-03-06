@@ -60,7 +60,7 @@ public class NettyInitial implements ApplicationListener<ContextRefreshedEvent> 
 					}
 				   });
 	
-			int port = 8080;
+			int port = 18080;
 
 			//在 Netty 中，所有的 I/O 操作（如 connect, write, close）都是异步的。
 			// 调用这些方法会立即返回，而 ChannelFuture 就是那张**“取货凭证”**，代表了一个尚未完成的操作结果。
@@ -71,7 +71,7 @@ public class NettyInitial implements ApplicationListener<ContextRefreshedEvent> 
 
 			//底层动作：Netty 的 Boss 线程池跑去操作系统那里，成功把 8080 端口绑定了。
 			//此时的返回值 f，里面包裹着的，正是刚才建好的那扇**“迎宾大门” (NioServerSocketChannel)**。
-			ChannelFuture f = serverBootstrap.bind(8080).sync();
+			ChannelFuture f = serverBootstrap.bind(18080).sync();
 		
 			InetAddress address = InetAddress.getLocalHost();
 			CuratorFramework client = ZooKeeperFactory.getClient();

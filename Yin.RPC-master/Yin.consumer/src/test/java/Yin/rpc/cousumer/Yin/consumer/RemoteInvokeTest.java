@@ -26,6 +26,7 @@ public class RemoteInvokeTest {
 
 	@RemoteInvoke
 	public static TestRemote userremote;
+
 	public static User user;
 	public static Long count = 0l;
 	
