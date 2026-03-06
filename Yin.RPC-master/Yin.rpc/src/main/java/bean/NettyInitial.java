@@ -1,7 +1,9 @@
 package bean;
 
 import java.net.InetAddress;
+import java.util.concurrent.TimeUnit;
 
+import io.netty.handler.timeout.IdleStateHandler;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
 import org.springframework.context.ApplicationListener;
@@ -49,12 +51,11 @@ public class NettyInitial implements ApplicationListener<ContextRefreshedEvent> 
 						// 设置\r\n为分隔符，防粘包工序。底层的 TCP 是像水流一样的字节流，它可不管你发的是一个 JSON 还是半个 JSON，它可能把两个请求粘在一起发过来。
 						ch.pipeline().addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, Delimiters.lineDelimiter()[0]));
 						ch.pipeline().addLast(new StringDecoder());//字符串解码器
-//						ch.pipeline().addLast(new IdleStateHandler(20, 15, 10, TimeUnit.SECONDS));
+						ch.pipeline().addLast(new IdleStateHandler(20, 15, 10, TimeUnit.SECONDS));
 
 						//虽然此时还在 work 线程，但作者做了一个极其重要的决定——提交给 Executor exec（业务线程池）。
 						//work 线程把这个 String 消息往线程池里一丢，它的 IO 任务就完成了，立刻回去处理下一个网络包。
 						ch.pipeline().addLast(new ServerHandler());//业务逻辑处理处
-
 						ch.pipeline().addLast(new StringEncoder());//字符串编码器
 					}
 				   });
@@ -67,6 +68,9 @@ public class NettyInitial implements ApplicationListener<ContextRefreshedEvent> 
 			//无论在服务端还是客户端，CuratorFramework 的本质就是一个**“Zookeeper 官方指定的高级通讯手机”**。
 			//Zookeeper（ZK）是一台远在天边的中央服务器（类似房产中介的数据库）。你的 Java 程序想和这台中介数据库说话，就必须得有一部能连上它的手机。
 			// CuratorFramework 就是这部手机。
+
+			//底层动作：Netty 的 Boss 线程池跑去操作系统那里，成功把 8080 端口绑定了。
+			//此时的返回值 f，里面包裹着的，正是刚才建好的那扇**“迎宾大门” (NioServerSocketChannel)**。
 			ChannelFuture f = serverBootstrap.bind(8080).sync();
 		
 			InetAddress address = InetAddress.getLocalHost();
